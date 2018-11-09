@@ -7,4 +7,49 @@ layout: default
 
 <img src = "https://4.bp.blogspot.com/-FMrwBgbgREM/W-UK5EqHKkI/AAAAAAAAAEA/byH6UJKM8lQC6trSwt6dY_wyqo0Zr1bLACLcBGAs/s1600/ER.png" height = "500" width = "500">
 
+  <h3> The tables I created had the following schema: </h3>
+  
+  <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">SKILL (Code, Description)
+TRAINING (Train_Num, Code<span style="color: #333333">@</span>, Emp_Num<span style="color: #333333">@</span>, Date_Acquired, Name, Comments)
+DEPARTMENT (Dept_Code, Name, <span style="color: #008800; font-weight: bold">Location</span>, Phone, Manager_ID<span style="color: #333333">@</span>)
+EMPLOYEE (Emp_Num, Emp_Last, Emp_First, DOB, Hire_Date, Super_ID<span style="color: #333333">@</span>, Dept_Code<span style="color: #333333">@</span>)
+CLIENT (Client_ID, Name, Street, City, <span style="color: #008800; font-weight: bold">State</span>, Zip_Code, Industry, Web_Address, Phone,
+Contact_Name)
+PROJECT (Proj_Number, Name, Start_Date, Total_Cost, Dept_Code<span style="color: #333333">@</span>, Client_ID<span style="color: #333333">@</span>)
+<span style="color: #008800; font-weight: bold">ASSIGNMENT</span> (Assign_Num, Proj_Number<span style="color: #333333">@</span>, Emp_Num<span style="color: #333333">@</span>, Date_Assigned, Date_Ended,
+Hours_Used)
+</pre></div>
+
 <h3> Once the database was created using Oracle 11g, It was time to implement some tough SQL questions in the form of queries. </h3>
+  <ul>
+  <li>The company’s human resources department needs information on the current training
+levels of the employees. They need information that shows, for each employee, and
+his/her acquired skills, the number of times he or she received training for that skill, the
+most recent date of the training, and the number of months (full months only) that have
+passed since the most recent training for the skill. Include all employees in the output,
+even if they have not received any training yet.
+    
+    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">SELECT</span> EMP_NUM, EMP_FIRST<span style="color: #333333">||</span><span style="background-color: #fff0f0">&#39; &#39;</span><span style="color: #333333">||</span>EMP_LAST <span style="color: #008800; font-weight: bold">AS</span> <span style="color: #AA6600">&quot;EMPLOYEE&quot;</span>, SKILL.DESCRIPTION, <span style="color: #008800; font-weight: bold">COUNT</span>(CODE) <span style="color: #008800; font-weight: bold">AS</span> <span style="color: #AA6600">&quot;NO_OF_TIMES&quot;</span>, NVL((TO_CHAR(TRUNC(((SYSDATE) <span style="color: #333333">-</span> <span style="color: #008800; font-weight: bold">MAX</span>(TRAINING.DATE_ACQUIRED))<span style="color: #333333">/</span><span style="color: #0000DD; font-weight: bold">30</span>))),<span style="background-color: #fff0f0">&#39;N/A&#39;</span>) <span style="color: #008800; font-weight: bold">AS</span> <span style="color: #AA6600">&quot;MONTHS&quot;</span>,NVL(TO_CHAR(<span style="color: #008800; font-weight: bold">MAX</span>(TRAINING.DATE_ACQUIRED)),<span style="background-color: #fff0f0">&#39;N/A&#39;</span>) <span style="color: #008800; font-weight: bold">AS</span> <span style="color: #AA6600">&quot;RECENT DATE&quot;</span>
+<span style="color: #008800; font-weight: bold">FROM</span> EMPLOYEE <span style="color: #008800; font-weight: bold">LEFT</span> <span style="color: #008800; font-weight: bold">OUTER</span> <span style="color: #008800; font-weight: bold">JOIN</span> TRAINING <span style="color: #008800; font-weight: bold">USING</span>(EMP_NUM)
+<span style="color: #008800; font-weight: bold">LEFT</span> <span style="color: #008800; font-weight: bold">OUTER</span> <span style="color: #008800; font-weight: bold">JOIN</span> SKILL <span style="color: #008800; font-weight: bold">USING</span> (CODE)
+<span style="color: #008800; font-weight: bold">GROUP</span> <span style="color: #008800; font-weight: bold">BY</span> EMP_NUM,EMP_FIRST,EMP_LAST,SKILL.DESCRIPTION;
+</pre></div>
+    
+    </li>
+    
+    <li>
+      Due to a recent re-organization, the company needs a list that shows who supervises who.
+List all the employees in the company clearly indicating the organizational hierarchy.
+Include the “level” of the hierarchy each employee is at and the department name of the
+employee.
+      <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">SELECT</span> <span style="color: #008800; font-weight: bold">LEVEL</span>,
+LPAD(<span style="background-color: #fff0f0">&#39; &#39;</span>, <span style="color: #0000DD; font-weight: bold">3</span><span style="color: #333333">*</span>(<span style="color: #008800; font-weight: bold">LEVEL</span> <span style="color: #333333">-</span> <span style="color: #0000DD; font-weight: bold">1</span>)) <span style="color: #333333">||</span> EMP_NUM <span style="color: #333333">||</span> <span style="background-color: #fff0f0">&#39; &#39;</span> <span style="color: #333333">||</span>
+EMP_FIRST <span style="color: #333333">||</span> <span style="background-color: #fff0f0">&#39; &#39;</span> <span style="color: #333333">||</span> EMP_LAST <span style="color: #008800; font-weight: bold">AS</span> <span style="color: #AA6600">&quot;EMPLOYEE&quot;</span>, DEPT_CODE,DEPARTMENT.NAME
+<span style="color: #008800; font-weight: bold">FROM</span> EMPLOYEE <span style="color: #008800; font-weight: bold">JOIN</span> DEPARTMENT <span style="color: #008800; font-weight: bold">USING</span>(DEPT_CODE)
+<span style="color: #008800; font-weight: bold">START</span> <span style="color: #008800; font-weight: bold">WITH</span> EMP_NUM <span style="color: #333333">=</span> <span style="background-color: #fff0f0">&#39;400&#39;</span>
+<span style="color: #008800; font-weight: bold">CONNECT</span> <span style="color: #008800; font-weight: bold">BY</span> <span style="color: #008800; font-weight: bold">PRIOR</span> EMP_NUM <span style="color: #333333">=</span> SUPER_ID;
+<span style="color: #008800; font-weight: bold">LEFT</span> <span style="color: #008800; font-weight: bold">OUTER</span> <span style="color: #008800; font-weight: bold">JOIN</span> SKILL <span style="color: #008800; font-weight: bold">USING</span> (CODE)
+<span style="color: #008800; font-weight: bold">GROUP</span> <span style="color: #008800; font-weight: bold">BY</span> EMP_NUM,EMP_FIRST,EMP_LAST,SKILL.DESCRIPTION;
+</pre></div>
+
+    </li>
